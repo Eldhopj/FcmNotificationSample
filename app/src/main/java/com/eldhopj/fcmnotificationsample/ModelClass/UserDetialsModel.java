@@ -1,8 +1,11 @@
-package com.eldhopj.fcmnotificationsample;
+package com.eldhopj.fcmnotificationsample.ModelClass;
 
 public class UserDetialsModel {
     private String email;
     private String token;
+
+    public UserDetialsModel() {
+    }
 
     public UserDetialsModel(String email, String token) {
         this.email = email;
@@ -16,4 +19,5 @@ public class UserDetialsModel {
     public String getToken() {
         return token;
     }
+
 }

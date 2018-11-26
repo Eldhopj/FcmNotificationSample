@@ -1,4 +1,4 @@
-package com.eldhopj.fcmnotificationsample;
+package com.eldhopj.fcmnotificationsample.Utils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -13,16 +13,16 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.eldhopj.fcmnotificationsample.MainActivity;
+import com.eldhopj.fcmnotificationsample.R;
 
 public class NotificationUtils {
+    private static final String TAG = "NotificationUtils";
 
     //Notification Channels
-    public static final String WATER_REMINDER_NOTIFICATION_CHANNEL_ID = "reminder_notification_channel";
+    public static final String FCM_NOTIFICATION_CHANNEL_ID = "reminder_notification_channel";
     public static final int NOTIFICATION_ID = 1234;
     private static final int PENDING_INTENT_ID = 3417;
     private static final String CHANNEL_ID = "Dexlock";
@@ -48,13 +48,17 @@ public class NotificationUtils {
         return largeIcon;
     }
 
+
+
     //This method is responsible for creating the notification and notification channel in which the notification belongs to and displaying it
     public static void createNotifications(Context context,String title, String body) {
+
+        Log.d(TAG, "createNotifications: "+body);
 
         /**From Oreo we need to display notifications in the notification channel*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
-                    WATER_REMINDER_NOTIFICATION_CHANNEL_ID, //String ID
+                    FCM_NOTIFICATION_CHANNEL_ID, //String ID
                     CHANNEL_NAME, //Name for the channel
                     NotificationManager.IMPORTANCE_HIGH); //Importance for the notification , In high we get headsUp notification
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -62,15 +66,14 @@ public class NotificationUtils {
         }
 
         //Notification Builder
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, WATER_REMINDER_NOTIFICATION_CHANNEL_ID)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, FCM_NOTIFICATION_CHANNEL_ID)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_android)
                 .setLargeIcon(largeIcon(context))
                 .setContentTitle(title) // Title
-                .setContentText(body) //Text
+
                 // check different styles ref: https://developer.android.com/training/notify-user/expanded
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                        "This is a mok notification :D"))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
                 .setDefaults(Notification.DEFAULT_VIBRATE) // needed to add vibration permission on the manifest
                 .setContentIntent(contentIntent(context)) //pending Intent (check its fn)
 
@@ -97,20 +100,7 @@ public class NotificationUtils {
     }
 
 
-    public Bitmap getBitmapFromURL(String strURL) {
-        try {
-            URL url = new URL(strURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
 
 
 }

@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.eldhopj.fcmnotificationsample.ModelClass.UserDetialsModel;
+import com.eldhopj.fcmnotificationsample.Utils.Commons;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,37 +22,45 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
     FirebaseAuth mAuth;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         mAuth = FirebaseAuth.getInstance();
-        generateToken();
+
+        String token = Commons.TOKEN;
+
+        Log.d(TAG, "onCreate: "+token);
+        generateFcmToken();
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart() { // checking the user login or not
         super.onStart();
         if (mAuth.getCurrentUser() == null){
             mainActivityIntent();
         }
     }
-    private void generateToken() {
+
+    private void generateFcmToken() { //Generating FCM token
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (task.isSuccessful()){
-                            String token = task.getResult().getToken();
-                            Log.d(TAG, "onComplete: "+ token);
+                            String token = task.getResult().getToken(); // Getting token in here
+                            Commons.TOKEN = token;
                             saveToken(token);
+                            Log.d(TAG, "onComplete: "+ token);
                         }else {
                             Toast.makeText(getApplicationContext(), task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
-    public void saveToken(String token){
+
+    public void saveToken(String token){ // Saving token into firebase DB
         String email = mAuth.getCurrentUser().getEmail();
         String uId = mAuth.getCurrentUser().getUid();
 
@@ -70,7 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void logout(View view) {
+    public void logout(View view) { // logout user
         mAuth.signOut();
         if (mAuth.getCurrentUser()==null){
             mainActivityIntent();

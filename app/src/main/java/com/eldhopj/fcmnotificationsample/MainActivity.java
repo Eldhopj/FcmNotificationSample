@@ -52,38 +52,6 @@ public class MainActivity extends AppCompatActivity {
         createUser();
     }
 
-    private boolean validateEmail() {
-        emailID = editTextEmail.getText().toString().trim();
-        if (!(Patterns.EMAIL_ADDRESS.matcher(emailID).matches())) {
-            editTextEmail.setError("Email required");
-            editTextEmail.requestFocus();
-            return false;
-        } else {
-            editTextEmail.setError(null);
-            return true;
-        }
-    }
-
-    private boolean validatePassword(){
-        password = editTextPassword.getText().toString().trim();
-
-        if (password.isEmpty()){
-            editTextPassword.setError("Field Cant be Empty");
-            editTextPassword.requestFocus();
-            return false;
-        }
-        else if (password.length() < 6){
-            editTextPassword.setError("Minimum 6 characters needed");
-            editTextPassword.requestFocus();
-            return false;
-        }
-        else {
-            editTextPassword.setError(null);
-            editTextPassword.setError(null);
-            return true;
-        }
-
-    }
 
     private void createUser() {
 
@@ -136,5 +104,39 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    //---------------------Validations-----------------------------//
+    private boolean validateEmail() {
+        emailID = editTextEmail.getText().toString().trim();
+        if (!(Patterns.EMAIL_ADDRESS.matcher(emailID).matches())) {
+            editTextEmail.setError("Email required");
+            editTextEmail.requestFocus();
+            return false;
+        } else {
+            editTextEmail.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validatePassword(){
+        password = editTextPassword.getText().toString().trim();
+
+        if (password.isEmpty()){
+            editTextPassword.setError("Field Cant be Empty");
+            editTextPassword.requestFocus();
+            return false;
+        }
+        else if (password.length() < 6){
+            editTextPassword.setError("Minimum 6 characters needed");
+            editTextPassword.requestFocus();
+            return false;
+        }
+        else {
+            editTextPassword.setError(null);
+            editTextPassword.setError(null);
+            return true;
+        }
+
+    }
+//---------------------Validations-----------------------------//
 
 }
