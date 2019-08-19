@@ -10,10 +10,11 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.eldhopj.fcmnotificationsample.MainActivity;
 import com.eldhopj.fcmnotificationsample.R;
@@ -22,8 +23,8 @@ public class NotificationUtils {
     private static final String TAG = "NotificationUtils";
 
     //Notification Channels
-    public static final String FCM_NOTIFICATION_CHANNEL_ID = "reminder_notification_channel";
-    public static final int NOTIFICATION_ID = 1234;
+    private static final String FCM_NOTIFICATION_CHANNEL_ID = "reminder_notification_channel";
+    private static final int NOTIFICATION_ID = 1234;
     private static final int PENDING_INTENT_ID = 3417;
     private static final String CHANNEL_ID = "Dexlock";
     private static final String CHANNEL_NAME = "eldhopj";
@@ -98,10 +99,5 @@ public class NotificationUtils {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
     }
-
-
-
-
-
 }
 

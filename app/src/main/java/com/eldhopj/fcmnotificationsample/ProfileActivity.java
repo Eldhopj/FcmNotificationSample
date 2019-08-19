@@ -2,11 +2,12 @@ package com.eldhopj.fcmnotificationsample;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.eldhopj.fcmnotificationsample.ModelClass.UserDetialsModel;
 import com.eldhopj.fcmnotificationsample.Utils.Commons;
@@ -20,7 +21,7 @@ import com.google.firebase.iid.InstanceIdResult;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -49,29 +50,34 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (task.isSuccessful()){
-                            String token = task.getResult().getToken(); // Getting token in here
-                            Commons.TOKEN = token;
-                            saveToken(token);
-                            Log.d(TAG, "onComplete: "+ token);
+                            if (task.getResult() != null) {
+                                String token = task.getResult().getToken(); // Getting token in here
+                                Commons.TOKEN = token;
+                                saveToken(token);
+                                Log.d(TAG, "onComplete: " + token);
+                            }
                         }else {
-                            Toast.makeText(getApplicationContext(), task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            if (task.getException() != null)
+                                Toast.makeText(getApplicationContext(), task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    public void saveToken(String token){ // Saving token into firebase DB
-        String email = mAuth.getCurrentUser().getEmail();
-        String uId = mAuth.getCurrentUser().getUid();
+    private void saveToken(String token) { // Saving token into firebase DB
+        if (mAuth.getCurrentUser() != null) {
+            String email = mAuth.getCurrentUser().getEmail();
+            String uId = mAuth.getCurrentUser().getUid();
 
-        UserDetialsModel user = new UserDetialsModel(email,token);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        databaseReference.child(uId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "onComplete: Token Saved");
-            }
-        });
+            UserDetialsModel user = new UserDetialsModel(email, token);
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
+            databaseReference.child(uId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.d(TAG, "onComplete: Token Saved");
+                }
+            });
+        }
     }
 
     private void mainActivityIntent() {
