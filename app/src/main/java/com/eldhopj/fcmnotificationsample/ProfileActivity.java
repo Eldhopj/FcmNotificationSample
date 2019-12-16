@@ -21,7 +21,7 @@ import com.google.firebase.iid.InstanceIdResult;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
-    private FirebaseAuth mAuth;
+    FirebaseAuth mAuth;
 
 
     @Override
@@ -50,34 +50,35 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (task.isSuccessful()){
-                            if (task.getResult() != null) {
-                                String token = task.getResult().getToken(); // Getting token in here
-                                Commons.TOKEN = token;
-                                saveToken(token);
-                                Log.d(TAG, "onComplete: " + token);
-                            }
+                            String token = task.getResult().getToken(); // Getting token in here
+                            Commons.TOKEN = token;
+                            saveToken(token);
+                            Log.d(TAG, "onComplete: " + token);
                         }else {
-                            if (task.getException() != null)
-                                Toast.makeText(getApplicationContext(), task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    private void saveToken(String token) { // Saving token into firebase DB
-        if (mAuth.getCurrentUser() != null) {
-            String email = mAuth.getCurrentUser().getEmail();
-            String uId = mAuth.getCurrentUser().getUid();
-
-            UserDetialsModel user = new UserDetialsModel(email, token);
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
-            databaseReference.child(uId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Log.d(TAG, "onComplete: Token Saved");
-                }
-            });
+    public void saveToken(String token) { // Saving token into firebase DB
+        if (mAuth.getCurrentUser() == null) {
+            return;
         }
+        String email = "";
+        if (mAuth.getCurrentUser().getEmail() == null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        String uId = mAuth.getCurrentUser().getUid();
+
+        UserDetialsModel user = new UserDetialsModel(email, token);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference.child(uId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d(TAG, "onComplete: Token Saved");
+            }
+        });
     }
 
     private void mainActivityIntent() {
