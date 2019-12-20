@@ -16,26 +16,18 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
-import com.eldhopj.fcmnotificationsample.MainActivity;
 import com.eldhopj.fcmnotificationsample.R;
 
 public class NotificationUtils {
     private static final String TAG = "NotificationUtils";
 
-    //Notification Channels
-    private static final String FCM_NOTIFICATION_CHANNEL_ID = "reminder_notification_channel";
-    private static final int NOTIFICATION_ID = 1234;
-    private static final int PENDING_INTENT_ID = 3417;
-    private static final String CHANNEL_ID = "Dexlock";
-    private static final String CHANNEL_NAME = "eldhopj";
-    private static final String CHANNEL_DESC = "Test Channel";
-
     //Allows to relaunch the app when we click the notification
-    private static PendingIntent contentIntent(Context context) {
+    private static PendingIntent contentIntent(Context context, Class<?> launchActivity, String channel, int NOTIFICATION_ID) {
 
-        Intent startActivityIntent = new Intent(context, MainActivity.class);
+        Intent startActivityIntent = new Intent(context, launchActivity);
+        startActivityIntent.putExtra("redirection", channel); //Passing data from
         return PendingIntent.getActivity(context,
-                PENDING_INTENT_ID,
+                NOTIFICATION_ID,
                 startActivityIntent,
                 //FLAG_UPDATE_CURRENT -> keeps this instance valid and just updates the extra data associated with it coming from new intent
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -52,22 +44,25 @@ public class NotificationUtils {
 
 
     //This method is responsible for creating the notification and notification channel in which the notification belongs to and displaying it
-    public static void createNotifications(Context context,String title, String body) {
+    public static void createNotifications(Context context, String title, String body, String channelId, Class<?> launchActivity) {
+        final int NOTIFICATION_ID = (int) System.currentTimeMillis();
 
         Log.d(TAG, "createNotifications: "+body);
 
         /**From Oreo we need to display notifications in the notification channel*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
-                    FCM_NOTIFICATION_CHANNEL_ID, //String ID
-                    CHANNEL_NAME, //Name for the channel
+                    channelId, //String ID
+                    channelId, //Name for the channel ,(NOTE: here considering channel name same as channel Id)
                     NotificationManager.IMPORTANCE_HIGH); //Importance for the notification , In high we get headsUp notification
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.createNotificationChannel(mChannel);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(mChannel);
+            }
         }
 
         //Notification Builder
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, FCM_NOTIFICATION_CHANNEL_ID)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, channelId)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_android)
                 .setLargeIcon(largeIcon(context))
@@ -76,10 +71,12 @@ public class NotificationUtils {
                 // check different styles ref: https://developer.android.com/training/notify-user/expanded
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
                 .setDefaults(Notification.DEFAULT_VIBRATE) // needed to add vibration permission on the manifest
-                .setContentIntent(contentIntent(context)) //pending Intent (check its fn)
-
-
+                .setContentIntent(contentIntent(context,
+                        launchActivity,
+                        channelId,
+                        NOTIFICATION_ID)) //pending Intent (check its fn)
                 .setAutoCancel(true); //Notification will go away when user clicks on it
+
         /**this will give heads up notification on versions below Oreo*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -97,7 +94,9 @@ public class NotificationUtils {
     public static void clearAllNotifications(Context context) {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
+        if (notificationManager != null) {
+            notificationManager.cancelAll();
+        }
     }
 }
 
