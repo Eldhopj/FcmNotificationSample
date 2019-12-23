@@ -1,37 +1,23 @@
-package com.eldhopj.fcmnotificationsample.Utils;
+package com.eldhopj.fcmnotificationsample.fcm.notificationUtils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.eldhopj.fcmnotificationsample.R;
+import com.google.firebase.messaging.RemoteMessage;
 
 public class NotificationUtils {
     private static final String TAG = "NotificationUtils";
-
-    //Allows to relaunch the app when we click the notification
-    private static PendingIntent contentIntent(Context context, Class<?> launchActivity, String channel, int NOTIFICATION_ID) {
-
-        Intent startActivityIntent = new Intent(context, launchActivity);
-        startActivityIntent.putExtra("redirection", channel); //Passing data from
-        return PendingIntent.getActivity(context,
-                NOTIFICATION_ID,
-                startActivityIntent,
-                //FLAG_UPDATE_CURRENT -> keeps this instance valid and just updates the extra data associated with it coming from new intent
-                PendingIntent.FLAG_UPDATE_CURRENT);
-    }
 
     //Helps to create a bitmap image shown in the Notification
     private static Bitmap largeIcon(Context context) {
@@ -44,10 +30,16 @@ public class NotificationUtils {
 
 
     //This method is responsible for creating the notification and notification channel in which the notification belongs to and displaying it
-    public static void createNotifications(Context context, String title, String body, String channelId, Class<?> launchActivity) {
+    public static void createNotifications(Context context, RemoteMessage remoteMessage) {
+        if (remoteMessage.getNotification() == null) {
+            return;
+        }
         final int NOTIFICATION_ID = (int) System.currentTimeMillis();
-
-        Log.d(TAG, "createNotifications: "+body);
+        String title = remoteMessage.getNotification().getTitle();
+        String body = remoteMessage.getNotification().getBody();
+        String channelId = "general";
+        if (remoteMessage.getNotification().getChannelId() != null)
+            channelId = remoteMessage.getNotification().getChannelId();
 
         /**From Oreo we need to display notifications in the notification channel*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -71,9 +63,7 @@ public class NotificationUtils {
                 // check different styles ref: https://developer.android.com/training/notify-user/expanded
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
                 .setDefaults(Notification.DEFAULT_VIBRATE) // needed to add vibration permission on the manifest
-                .setContentIntent(contentIntent(context,
-                        launchActivity,
-                        channelId,
+                .setContentIntent(NotificationPendingIntent.getIntent(context, remoteMessage,
                         NOTIFICATION_ID)) //pending Intent (check its fn)
                 .setAutoCancel(true); //Notification will go away when user clicks on it
 

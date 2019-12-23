@@ -1,4 +1,4 @@
-package com.eldhopj.fcmnotificationsample.Utils;
+package com.eldhopj.fcmnotificationsample.fcm.notificationUtils;
 
 import com.eldhopj.fcmnotificationsample.MainActivity;
 import com.eldhopj.fcmnotificationsample.ProfileActivity;
@@ -13,6 +13,8 @@ public class NotificationRedirection {
         }
         if (channel.equals("main"))
             return MainActivity.class;
+        if (channel.equals("profile"))
+            return ProfileActivity.class;
         else
             return ProfileActivity.class; // kind of a default case
     }

@@ -9,8 +9,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.eldhopj.fcmnotificationsample.ModelClass.UserDetialsModel;
-import com.eldhopj.fcmnotificationsample.Utils.Commons;
+import com.eldhopj.fcmnotificationsample.modelClass.UserDetialsModel;
+import com.eldhopj.fcmnotificationsample.utils.Commons;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,6 +34,25 @@ public class ProfileActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: "+token);
         generateFcmToken();
+    }
+
+    /**
+     * onNewIntent(): needed to get the intent data from FCM if the activity is already running
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // What is the use of this? need help
+        getExtras();
+    }
+
+    private void getExtras() {
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            String id = bundle.getString("id");
+            String value = bundle.getString("value");
+        }
     }
 
     @Override

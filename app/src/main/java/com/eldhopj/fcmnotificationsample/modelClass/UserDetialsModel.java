@@ -1,4 +1,4 @@
-package com.eldhopj.fcmnotificationsample.ModelClass;
+package com.eldhopj.fcmnotificationsample.modelClass;
 
 public class UserDetialsModel {
     private String email;
