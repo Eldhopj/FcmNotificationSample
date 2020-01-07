@@ -13,8 +13,10 @@ public class FcmService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        NotificationUtils.createNotifications(getApplicationContext(),
-                remoteMessage);
+        if (remoteMessage.getNotification() != null) {
+            NotificationUtils.createNotifications(getApplicationContext(),
+                    remoteMessage);
+        }
     }
 
 

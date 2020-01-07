@@ -50,8 +50,8 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            String id = bundle.getString("id");
-            String value = bundle.getString("value");
+            // Get keys from notification to get the bundle values
+            String name = bundle.getString("id");
         }
     }
 
